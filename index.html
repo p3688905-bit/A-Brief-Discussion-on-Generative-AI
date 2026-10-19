@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 課程初探｜淺談生成式 AI（AIGC）— 學習指引</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-tc/400.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-tc/500.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-tc/700.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-tc/600.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-tc/700.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-tc/900.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono/400.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono/500.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono/700.css">
+<style>
+:root{
+  --paper:#F4EFE4; --paper-2:#ECE5D3; --paper-3:#E4DCC6;
+  --ink:#171C33; --ink-2:#4A5070; --ink-3:#7A7F99;
+  --violet:#5B4BE0; --violet-soft:rgba(91,75,224,.14); --violet-line:rgba(91,75,224,.35);
+  --teal:#2AA6A0; --green:#2E8B6A; --red:#C8442A; --amber:#D99114;
+  --dark:#0A0D1C; --dark-2:#0E1226; --dark-3:#120D1F; --danger:#FF6B4A;
+  --f-serif:'Noto Serif TC','Songti TC',serif;
+  --f-sans:'Noto Sans TC',system-ui,-apple-system,sans-serif;
+  --f-mono:'JetBrains Mono','Noto Sans TC',monospace;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--f-sans);background:var(--paper);color:var(--ink);
+  line-height:1.75;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+::selection{background:var(--violet);color:#fff}
+img,svg{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;background:none;border:none;color:inherit}
+.mono{font-family:var(--f-mono)}
+.serif{font-family:var(--f-serif)}
+.container{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,44px)}
+section{scroll-margin-top:84px}
+mark{background:linear-gradient(transparent 60%,var(--violet-soft) 60%);color:inherit;padding:0 .12em;font-weight:700}
+:focus-visible{outline:2px solid var(--violet);outline-offset:3px;border-radius:2px}
+
+/* ── noise overlay ── */
+.noise{position:fixed;inset:0;z-index:2000;pointer-events:none;opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");}
+
+/* ── progress bar ── */
+#pbar{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--violet),var(--teal));z-index:1500}
+
+/* ── nav ── */
+#nav{position:fixed;top:0;left:0;right:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;
+  padding:14px clamp(18px,3vw,36px);transition:background .4s,box-shadow .4s,padding .4s;color:#EDEAF6}
+#nav.scrolled{background:rgba(244,239,228,.92);backdrop-filter:blur(10px);color:var(--ink);
+  box-shadow:0 1px 0 rgba(23,28,51,.12),0 12px 30px -18px rgba(23,28,51,.25);padding-top:10px;padding-bottom:10px}
+.brand{display:flex;align-items:baseline;gap:10px;font-family:var(--f-serif);font-weight:900;font-size:1.05rem;letter-spacing:.04em;white-space:nowrap}
+.brand-mark{color:var(--violet);font-size:1.2rem}
+.brand em{font-family:var(--f-mono);font-style:normal;font-weight:400;font-size:.62rem;letter-spacing:.22em;opacity:.65;transform:translateY(-1px)}
+.nav-links{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-link{display:flex;align-items:center;gap:6px;padding:7px 13px;font-size:.83rem;font-weight:500;white-space:nowrap;
+  border-radius:4px;position:relative;opacity:.82;transition:opacity .3s,background .3s}
+.nav-link .n{font-family:var(--f-serif);font-weight:900;font-size:.92em;color:var(--violet)}
+#nav:not(.scrolled) .nav-link .n{color:#9F93FF}
+.nav-link:hover{opacity:1;background:rgba(91,75,224,.1)}
+.nav-link.active{opacity:1}
+.nav-link.active::after{content:"";position:absolute;left:13px;right:13px;bottom:2px;height:2px;background:var(--violet)}
+
+/* ── reveal system ── */
+[data-reveal]{opacity:0;transform:translateY(26px);transition:opacity .85s ease,transform .85s var(--ease)}
+[data-reveal].in{opacity:1;transform:none}
+[data-reveal="mask"]{opacity:1;transform:none}
+.lm{display:block;overflow:hidden}
+.lm>span{display:block;transform:translateY(112%);transition:transform 1s var(--ease)}
+[data-reveal="mask"].in .lm>span{transform:none}
+
+/* ══════════ HERO ══════════ */
+.hero{position:relative;min-height:100svh;background:var(--dark);color:#EDEAF6;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden}
+#net{position:absolute;inset:0;width:100%;height:100%;opacity:.75}
+.hero-grid-bg{position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(139,124,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(139,124,255,.05) 1px,transparent 1px);
+  background-size:56px 56px;
+  mask-image:radial-gradient(ellipse 90% 80% at 50% 40%,#000 30%,transparent 100%)}
+.hero-inner{position:relative;z-index:2;width:100%;max-width:1180px;margin:0 auto;padding:120px clamp(20px,4vw,44px) 30px;flex:1;display:flex;flex-direction:column;justify-content:center}
+.hero-top{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:clamp(24px,4vh,44px)}
+.chip{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(139,124,255,.35);border-radius:999px;
+  padding:6px 14px;font-size:.68rem;letter-spacing:.18em;color:#BDB4EE}
+.chip .pulse-dot{width:7px;height:7px;border-radius:50%;background:var(--teal);animation:pulse 2.2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(42,166,160,.55)}55%{box-shadow:0 0 0 8px rgba(42,166,160,0)}}
+.hero-title{margin-bottom:clamp(26px,4.5vh,50px)}
+.ht-pre{font-family:var(--f-mono);font-size:clamp(.72rem,1.2vw,.9rem);letter-spacing:.34em;color:#8F86C9;display:block;margin-bottom:14px}
+.ht-main{font-family:var(--f-serif);font-weight:900;font-size:clamp(2.5rem,7.4vw,5.4rem);line-height:1.14;letter-spacing:.02em;display:block}
+.ht-main .vio{color:#9F93FF}
+.ht-sub{display:inline-flex;align-items:center;gap:14px;margin-top:18px;font-family:var(--f-mono);font-size:clamp(.68rem,1.1vw,.82rem);letter-spacing:.2em;color:#7E76B5}
+.ht-sub::before{content:"";width:52px;height:1px;background:var(--violet)}
+.hero-cols{display:grid;grid-template-columns:1fr 1.25fr;gap:clamp(24px,4vw,56px);align-items:end}
+.hero-note{font-size:clamp(.92rem,1.4vw,1.05rem);color:#A9A3CC;max-width:34ch;line-height:2}
+.hero-stats{display:grid;grid-template-columns:repeat(4,auto);gap:0;margin-top:26px;border:1px solid rgba(139,124,255,.25);border-radius:8px;overflow:hidden;width:fit-content}
+.stat{padding:14px 18px;border-right:1px solid rgba(139,124,255,.25)}
+.stat:last-child{border-right:none}
+.stat-num{display:block;font-family:var(--f-mono);font-weight:700;font-size:1.5rem;color:#9F93FF;line-height:1.1}
+.stat-lab{font-size:.66rem;letter-spacing:.1em;color:#7E76B5;white-space:nowrap}
+/* terminal */
+.terminal{background:var(--dark-2);border:1px solid rgba(139,124,255,.3);border-radius:12px;overflow:hidden;
+  box-shadow:0 40px 90px -30px rgba(0,0,0,.7),0 0 0 1px rgba(139,124,255,.08),inset 0 1px 0 rgba(255,255,255,.05)}
+.term-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;border-bottom:1px solid rgba(139,124,255,.18);background:rgba(255,255,255,.02)}
+.dot{width:10px;height:10px;border-radius:50%}
+.dot.r{background:#FF6B5E}.dot.y{background:#FFC24B}.dot.g{background:#3FD08C}
+.term-title{margin-left:8px;font-size:.68rem;letter-spacing:.16em;color:#8F86C9}
+.term-body{padding:20px 20px 24px;font-family:var(--f-mono);font-size:.82rem;line-height:2;min-height:148px}
+.t-line{display:flex;gap:10px;align-items:flex-start}
+.t-line+.t-line{margin-top:14px}
+.t-tag{flex:none;font-size:.62rem;letter-spacing:.14em;padding:2px 8px;border-radius:4px;margin-top:4px;line-height:1.6}
+.t-line.user .t-tag{background:rgba(42,166,160,.16);color:#5FD9D2;border:1px solid rgba(42,166,160,.4)}
+.t-line.ai .t-tag{background:rgba(139,124,255,.16);color:#A99CFF;border:1px solid rgba(139,124,255,.45)}
+.t-txt{color:#D9D5EF}
+.cursor{flex:none;width:8px;height:1.15em;background:#9F93FF;margin-top:6px;animation:blink 1s steps(1) infinite}
+.cursor.off{visibility:hidden}
+@keyframes blink{50%{opacity:0}}
+.vert-label{position:absolute;right:clamp(10px,2vw,28px);top:50%;transform:translateY(-52%);writing-mode:vertical-rl;
+  font-family:var(--f-mono);font-size:.68rem;letter-spacing:.5em;color:rgba(159,147,255,.5);z-index:2}
+.scroll-cue{position:absolute;left:clamp(20px,4vw,44px);bottom:64px;z-index:3;display:flex;align-items:center;gap:12px;
+  font-size:.62rem;letter-spacing:.34em;color:#8F86C9}
+.cue-line{width:1px;height:38px;background:linear-gradient(#9F93FF,transparent);position:relative;overflow:hidden}
+.cue-line::after{content:"";position:absolute;left:0;top:-40%;width:100%;height:40%;background:#fff;animation:cueDrop 1.8s var(--ease) infinite}
+@keyframes cueDrop{to{top:110%}}
+/* marquee */
+.marquee{position:relative;z-index:2;border-top:1px solid rgba(139,124,255,.25);background:rgba(10,13,28,.7);overflow:hidden;padding:13px 0}
+.mq-track{display:flex;width:max-content;animation:mq 30s linear infinite}
+.mq-track:hover{animation-play-state:paused}
+.mq-track span{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.24em;color:#8F86C9;padding:0 26px;white-space:nowrap;display:flex;align-items:center;gap:26px}
+.mq-track span::after{content:"◆";color:var(--violet);font-size:.55rem}
+@keyframes mq{to{transform:translateX(-50%)}}
+
+/* ══════════ SECTION HEADS ══════════ */
+.chapter{padding:clamp(84px,11vw,132px) 0;position:relative}
+.sec-head{position:relative;margin-bottom:clamp(48px,7vw,80px)}
+.ghost-num{position:absolute;top:-64px;right:-8px;font-family:var(--f-serif);font-weight:900;font-size:clamp(9rem,20vw,16rem);
+  line-height:1;color:rgba(23,28,51,.055);pointer-events:none;user-select:none}
+.kicker{display:inline-flex;align-items:center;gap:12px;font-size:.68rem;letter-spacing:.3em;color:var(--violet);margin-bottom:16px;font-weight:500}
+.kicker::before{content:"";width:34px;height:1px;background:var(--violet)}
+.sec-title{font-family:var(--f-serif);font-weight:900;font-size:clamp(1.9rem,4.6vw,3.1rem);letter-spacing:.03em;line-height:1.25}
+.sec-title em{font-style:normal;color:var(--violet)}
+.sec-lede{margin-top:20px;max-width:64ch;color:var(--ink-2);font-size:clamp(.95rem,1.4vw,1.06rem)}
+.sub-head{display:flex;align-items:baseline;gap:16px;margin:clamp(56px,8vw,84px) 0 34px}
+.sub-idx{font-family:var(--f-mono);font-size:.8rem;color:var(--violet);letter-spacing:.14em;border:1px solid var(--violet-line);padding:4px 10px;border-radius:4px}
+.sub-head h3{font-family:var(--f-serif);font-weight:900;font-size:clamp(1.3rem,2.6vw,1.8rem);letter-spacing:.04em}
+.sub-head::after{content:"";flex:1;height:1px;background:rgba(23,28,51,.15);transform:translateY(-6px)}
+
+/* ══════════ CH1 · TIMELINE ══════════ */
+.timeline{position:relative;padding-left:clamp(20px,3vw,34px)}
+.tl-rail{position:absolute;left:7px;top:8px;bottom:8px;width:2px;background:rgba(23,28,51,.14);border-radius:2px}
+.tl-fill{width:100%;height:0%;background:linear-gradient(var(--violet),var(--teal));border-radius:2px;transition:height .2s linear}
+.tl-list{list-style:none;display:flex;flex-direction:column;gap:clamp(20px,3vw,30px)}
+.tl-item{position:relative;display:grid;grid-template-columns:clamp(86px,12vw,128px) 1fr;gap:clamp(14px,2.5vw,26px);align-items:start}
+.tl-dot{position:absolute;left:calc(-1*clamp(20px,3vw,34px) + 1px);top:14px;width:14px;height:14px;border-radius:50%;
+  background:var(--paper);border:3px solid var(--ink-3);transition:border-color .5s,transform .5s,box-shadow .5s}
+.tl-item.on .tl-dot{border-color:var(--violet);transform:scale(1.2);box-shadow:0 0 0 6px var(--violet-soft)}
+.tl-year{font-family:var(--f-mono);font-weight:700;font-size:clamp(1.15rem,2.4vw,1.7rem);color:var(--ink-3);line-height:1.25;transition:color .5s}
+.tl-year small{display:block;font-size:.62rem;letter-spacing:.2em;font-weight:500;color:var(--ink-3)}
+.tl-item.on .tl-year{color:var(--ink)}
+.tl-card{background:#FBF8F0;border:1px solid rgba(23,28,51,.16);border-radius:8px;padding:16px 20px;
+  box-shadow:5px 5px 0 rgba(23,28,51,.08);transition:transform .35s var(--ease),box-shadow .35s}
+.tl-card:hover{transform:translate(-2px,-2px);box-shadow:8px 8px 0 rgba(91,75,224,.16)}
+.tl-card h4{font-family:var(--f-serif);font-weight:900;font-size:1.02rem;letter-spacing:.03em;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tl-tag{font-size:.58rem;letter-spacing:.18em;color:var(--violet);border:1px solid var(--violet-line);border-radius:999px;padding:2px 9px;font-weight:500}
+.tl-card p{font-size:.86rem;color:var(--ink-2);margin-top:5px}
+
+/* ══════════ CH1 · THREE WAVES (stacked) ══════════ */
+.wave-stack{position:relative}
+.wave-card{position:sticky;top:calc(92px + var(--i)*34px);background:#FBF8F0;border:1.5px solid var(--ink);border-radius:12px;
+  padding:clamp(26px,4vw,44px);margin-bottom:38px;min-height:340px;box-shadow:0 24px 50px -26px rgba(23,28,51,.4);
+  display:grid;grid-template-columns:auto 1fr;gap:clamp(20px,3.5vw,44px);overflow:hidden;transition:transform .4s var(--ease)}
+.wave-card.w1{transform:rotate(-.5deg)}.wave-card.w2{transform:rotate(.45deg)}.wave-card.w3{transform:rotate(-.3deg)}
+.wave-side{writing-mode:vertical-rl;font-family:var(--f-mono);font-size:.7rem;letter-spacing:.3em;color:var(--ink-3);
+  border-left:1px solid rgba(23,28,51,.2);padding-left:16px}
+.wave-name{font-family:var(--f-serif);font-weight:900;font-size:clamp(1.35rem,3vw,2rem);display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.wave-name .en{font-size:.72rem;letter-spacing:.16em;color:var(--violet);font-weight:500}
+.wave-quote{font-family:var(--f-serif);font-weight:700;font-size:clamp(1.02rem,2vw,1.3rem);margin:16px 0 12px;color:var(--violet);line-height:1.7}
+.wave-desc{color:var(--ink-2);font-size:.94rem;max-width:62ch}
+.wave-badge{display:inline-flex;align-items:center;gap:8px;margin-top:20px;font-family:var(--f-mono);font-size:.7rem;letter-spacing:.14em;
+  padding:7px 14px;border-radius:4px}
+.wave-badge.bad{background:rgba(200,68,42,.1);color:var(--red);border:1px solid rgba(200,68,42,.4)}
+.wave-badge.good{background:rgba(46,139,106,.1);color:var(--green);border:1px solid rgba(46,139,106,.45)}
+.wave-badge .bdot{width:8px;height:8px;border-radius:50%;background:currentColor;animation:pulse 2.4s infinite}
+.wave-ghost{position:absolute;right:20px;bottom:-34px;font-family:var(--f-mono);font-weight:700;font-size:clamp(6rem,12vw,9.5rem);
+  color:rgba(23,28,51,.06);line-height:1;pointer-events:none}
+.wave-ico{position:absolute;top:24px;right:26px;width:52px;height:52px;color:var(--violet);opacity:.9}
+
+/* ══════════ CH2 ══════════ */
+.banner{position:relative;border-radius:14px;overflow:hidden;border:1.5px solid var(--ink);background:#EDE6D6;
+  box-shadow:10px 10px 0 rgba(91,75,224,.14);margin-bottom:34px}
+.banner svg{width:100%;height:auto}
+.banner-cap{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;gap:12px;align-items:center;
+  background:rgba(23,28,51,.86);color:#EDEAF6;padding:11px 20px;font-size:.78rem;letter-spacing:.06em;backdrop-filter:blur(4px)}
+.banner-cap .mono{font-size:.6rem;letter-spacing:.26em;color:#9F93FF}
+.kb-group{transform-origin:center;animation:kbFloat 14s ease-in-out infinite alternate}
+@keyframes kbFloat{from{transform:translate(0,0) scale(1)}to{transform:translate(-8px,6px) scale(1.045)}}
+.def-box{display:grid;grid-template-columns:auto 1fr;gap:clamp(18px,3vw,30px);background:#FBF8F0;border:1px solid rgba(23,28,51,.18);
+  border-left:5px solid var(--violet);border-radius:0 10px 10px 0;padding:clamp(20px,3vw,32px);margin-bottom:14px}
+.def-box .qmark{font-family:var(--f-serif);font-weight:900;font-size:3.4rem;color:var(--violet);line-height:.8}
+.def-box p{font-size:clamp(.95rem,1.5vw,1.08rem);max-width:72ch}
+/* stepper */
+.stepper{background:#FBF8F0;border:1.5px solid var(--ink);border-radius:12px;padding:clamp(24px,4vw,44px);box-shadow:8px 8px 0 rgba(23,28,51,.08)}
+.step-track{position:relative;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:28px}
+.step-line{position:absolute;top:21px;left:8%;right:8%;height:2px;background:rgba(23,28,51,.14)}
+.step-fill{height:100%;width:20%;background:linear-gradient(90deg,var(--violet),var(--teal));transition:width .6s var(--ease)}
+.step-btn{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 4px;z-index:2}
+.step-dot{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-mono);font-weight:700;font-size:.8rem;
+  background:var(--paper);border:2px solid rgba(23,28,51,.3);color:var(--ink-3);transition:all .45s var(--ease)}
+.step-btn:hover .step-dot{border-color:var(--violet);color:var(--violet)}
+.step-btn.active .step-dot{background:var(--violet);border-color:var(--violet);color:#fff;transform:scale(1.12);box-shadow:0 8px 20px -6px rgba(91,75,224,.6)}
+.step-name{font-weight:700;font-size:.86rem;letter-spacing:.04em;text-align:center}
+.step-en{font-size:.56rem;letter-spacing:.14em;color:var(--ink-3);text-align:center;text-transform:uppercase}
+.step-panels{position:relative;min-height:190px}
+.step-panel{position:absolute;inset:0;opacity:0;transform:translateY(14px);pointer-events:none;transition:opacity .5s ease,transform .5s var(--ease);
+  display:flex;flex-direction:column;justify-content:center}
+.step-panel.active{opacity:1;transform:none;pointer-events:auto}
+.step-panel p{font-size:clamp(.98rem,1.6vw,1.12rem);max-width:64ch}
+.panel-tag{margin-top:18px;font-size:.62rem;letter-spacing:.26em;color:var(--violet);align-self:flex-start;
+  border:1px solid var(--violet-line);border-radius:999px;padding:4px 12px}
+.step-hint{margin-top:16px;font-size:.62rem;letter-spacing:.2em;color:var(--ink-3);text-align:center}
+/* bento apps */
+.bento{display:grid;grid-template-columns:repeat(12,1fr);gap:clamp(16px,2.2vw,24px)}
+.app-card{grid-column:span 6;background:#FBF8F0;border:1.5px solid var(--ink);border-radius:12px;overflow:hidden;
+  display:flex;flex-direction:column;transition:transform .45s var(--ease),box-shadow .45s}
+.app-card:hover{transform:translateY(-6px);box-shadow:10px 14px 0 rgba(91,75,224,.16)}
+.app-card.s7{grid-column:span 7}.app-card.s5{grid-column:span 5}
+.app-media{position:relative;background:#EDE6D6;border-bottom:1.5px solid var(--ink);overflow:hidden}
+.app-media svg{width:100%;height:auto;transition:transform .8s var(--ease)}
+.app-card:hover .app-media svg{transform:scale(1.05)}
+.app-idx{position:absolute;top:12px;left:14px;font-family:var(--f-mono);font-size:.58rem;letter-spacing:.24em;color:var(--ink-2);
+  background:rgba(244,239,228,.9);border:1px solid rgba(23,28,51,.25);border-radius:999px;padding:4px 10px}
+.app-body{padding:clamp(18px,2.4vw,26px);display:flex;flex-direction:column;gap:10px;flex:1}
+.app-body h4{font-family:var(--f-serif);font-weight:900;font-size:1.2rem;letter-spacing:.04em;display:flex;align-items:baseline;gap:12px}
+.app-body h4 .en{font-family:var(--f-mono);font-size:.6rem;letter-spacing:.24em;color:var(--violet);font-weight:500}
+.app-body>p{font-size:.88rem;color:var(--ink-2)}
+.tools{margin-top:auto;padding-top:14px;border-top:1px dashed rgba(23,28,51,.25);display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+.tools-lab{font-family:var(--f-mono);font-size:.58rem;letter-spacing:.2em;color:var(--ink-3);margin-right:4px}
+.chip-tool{font-size:.72rem;font-weight:500;border:1px solid rgba(91,75,224,.4);color:var(--violet);border-radius:999px;
+  padding:3px 11px;background:rgba(91,75,224,.06);transition:background .3s,color .3s}
+.app-card:hover .chip-tool{background:var(--violet-soft)}
+.chip-tool:hover{background:var(--violet);color:#fff}
+/* floating shapes inside app svgs */
+.float-a{animation:floA 5s ease-in-out infinite alternate}
+.float-b{animation:floA 6.5s ease-in-out infinite alternate-reverse}
+.float-c{animation:floA 7.5s ease-in-out infinite alternate}
+@keyframes floA{from{transform:translateY(0)}to{transform:translateY(-7px)}}
+.wiggle{animation:wig 3.4s ease-in-out infinite alternate}
+@keyframes wig{from{transform:rotate(-2deg)}to{transform:rotate(2deg)}}
+/* features accordion */
+.feats{border-top:1.5px solid var(--ink)}
+.feat-item{border-bottom:1.5px solid var(--ink);transition:background .4s}
+.feat-item.open{background:#FBF8F0}
+.feat-head{width:100%;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:clamp(14px,3vw,30px);
+  padding:clamp(18px,2.6vw,26px) clamp(6px,1.5vw,18px);text-align:left;transition:padding-left .35s var(--ease)}
+.feat-head:hover{padding-left:clamp(12px,2.5vw,30px)}
+.feat-num{font-family:var(--f-serif);font-weight:900;font-size:clamp(1.4rem,3vw,2.1rem);color:rgba(23,28,51,.22);transition:color .4s;min-width:2.2ch}
+.feat-item.open .feat-num{color:var(--violet)}
+.feat-tt{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.feat-tt strong{font-family:var(--f-serif);font-weight:900;font-size:clamp(1.05rem,2vw,1.35rem);letter-spacing:.04em}
+.chip-sm{font-family:var(--f-mono);font-style:normal;font-size:.58rem;letter-spacing:.2em;color:var(--ink-2);
+  border:1px solid rgba(23,28,51,.3);border-radius:999px;padding:3px 11px}
+.feat-x{font-size:1.5rem;font-weight:400;color:var(--violet);transition:transform .5s var(--ease);line-height:1}
+.feat-item.open .feat-x{transform:rotate(45deg)}
+.feat-panel{display:grid;grid-template-rows:0fr;transition:grid-template-rows .55s var(--ease)}
+.feat-item.open .feat-panel{grid-template-rows:1fr}
+.feat-inner{overflow:hidden}
+.feat-inner-pad{padding:0 clamp(6px,1.5vw,18px) clamp(22px,3vw,32px) calc(clamp(6px,1.5vw,18px) + 2.2ch + clamp(14px,3vw,30px))}
+.feat-inner-pad>p{color:var(--ink-2);max-width:72ch;font-size:.94rem}
+.example{margin-top:16px;background:var(--violet-soft);border-left:4px solid var(--violet);border-radius:0 8px 8px 0;padding:14px 18px}
+.ex-lab{font-family:var(--f-mono);font-size:.62rem;letter-spacing:.2em;color:var(--violet);font-weight:700;display:block;margin-bottom:6px}
+.example p{font-size:.88rem;color:var(--ink)}
+
+/* ══════════ CH3 · RISKS ══════════ */
+.chapter-dark{background:var(--dark-3);color:#F0EAD9}
+.hazard{height:16px;background:repeating-linear-gradient(-45deg,var(--danger) 0 16px,var(--dark-3) 16px 32px)}
+.chapter-dark .kicker{color:var(--danger)}
+.chapter-dark .kicker::before{background:var(--danger)}
+.chapter-dark .ghost-num{color:rgba(255,255,255,.05)}
+.chapter-dark .sec-lede{color:#B8AFCB}
+.pull-quote{margin:0 0 clamp(48px,7vw,72px);font-family:var(--f-serif);font-weight:900;font-size:clamp(1.25rem,3vw,1.9rem);
+  line-height:1.8;border-left:4px solid var(--danger);padding-left:clamp(18px,3vw,30px);max-width:34em}
+.pull-quote .mono{display:block;margin-top:12px;font-size:.62rem;letter-spacing:.3em;color:#8F7BA8;font-weight:400}
+.risks{display:flex;flex-wrap:wrap;gap:clamp(16px,2.4vw,26px);justify-content:center}
+.flip{flex:1 1 300px;max-width:380px;min-height:400px;perspective:1400px;cursor:pointer}
+.flip-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .8s var(--ease)}
+.flip.flipped .flip-inner{transform:rotateY(180deg)}
+.flip-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;
+  padding:clamp(22px,2.6vw,30px);display:flex;flex-direction:column}
+.flip-front{background:#1B1430;border:1px solid rgba(255,107,74,.35)}
+.flip-back{background:#241B3D;border:1px solid rgba(255,107,74,.5);transform:rotateY(180deg);overflow:auto}
+.risk-ico{width:46px;height:46px;color:var(--danger);margin-bottom:auto}
+.flip-front h4{font-family:var(--f-serif);font-weight:900;font-size:1.6rem;margin-top:26px;letter-spacing:.05em}
+.risk-en{font-size:.6rem;letter-spacing:.28em;color:#8F7BA8;margin-top:6px}
+.flip-hint{margin-top:22px;font-size:.6rem;letter-spacing:.22em;color:var(--danger);display:flex;align-items:center;gap:8px}
+.flip-hint .spin-ic{display:inline-block;animation:spinSlow 5s linear infinite}
+@keyframes spinSlow{to{transform:rotate(360deg)}}
+.flip-back h5{font-family:var(--f-serif);font-weight:900;font-size:1.05rem;color:#FFB4A0;margin-bottom:10px;display:flex;gap:8px;align-items:center}
+.flip-back h5::before{content:"▍";color:var(--danger)}
+.flip-back p{font-size:.82rem;color:#D6CEE8;line-height:1.9}
+.risk-case{margin-top:14px;background:rgba(255,107,74,.1);border:1px dashed rgba(255,107,74,.45);border-radius:8px;padding:12px 14px}
+.risk-case .mono{font-size:.58rem;letter-spacing:.2em;color:var(--danger);font-weight:700}
+.risk-case p{font-size:.78rem;margin-top:6px;color:#EAE2F4}
+.flip-back .back-close{margin-top:auto;padding-top:14px;font-size:.58rem;letter-spacing:.22em;color:#8F7BA8}
+.risk-note{margin-top:clamp(40px,6vw,56px);text-align:center;font-size:.8rem;color:#8F7BA8;letter-spacing:.1em}
+.risk-note b{color:var(--danger)}
+
+/* ══════════ REFS ══════════ */
+.ref-list{list-style:none;display:flex;flex-direction:column;gap:14px;max-width:760px}
+.ref-list li{display:flex;align-items:center;gap:20px;background:#FBF8F0;border:1px solid rgba(23,28,51,.18);
+  border-radius:8px;padding:18px 24px;transition:transform .4s var(--ease),box-shadow .4s,border-color .4s}
+.ref-list li:hover{transform:translateX(10px);border-color:var(--violet);box-shadow:-6px 6px 0 var(--violet-soft)}
+.ref-idx{font-family:var(--f-mono);color:var(--violet);font-size:.78rem;letter-spacing:.1em;flex:none}
+.ref-title{font-family:var(--f-serif);font-weight:700;font-size:clamp(1rem,1.8vw,1.2rem);letter-spacing:.04em}
+.ref-list li::after{content:"→";margin-left:auto;color:rgba(23,28,51,.25);transition:color .3s,transform .3s}
+.ref-list li:hover::after{color:var(--violet);transform:translateX(4px)}
+.colophon{margin-top:clamp(40px,6vw,56px);font-size:.68rem;letter-spacing:.18em;color:var(--ink-3);
+  display:flex;align-items:center;gap:14px}
+.colophon::before{content:"";width:44px;height:1px;background:var(--ink-3)}
+
+/* ══════════ FOOTER ══════════ */
+footer{background:var(--dark);color:#8F86C9;padding:44px 0;border-top:1px solid rgba(139,124,255,.25)}
+.foot-inner{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.foot-brand{font-family:var(--f-serif);font-weight:900;color:#EDEAF6;font-size:1.02rem;letter-spacing:.05em}
+.foot-note{font-size:.6rem;letter-spacing:.26em}
+.to-top{border:1px solid rgba(139,124,255,.45);color:#BDB4EE;border-radius:999px;padding:9px 22px;font-size:.76rem;
+  letter-spacing:.12em;transition:background .3s,color .3s,transform .3s}
+.to-top:hover{background:var(--violet);color:#fff;transform:translateY(-3px)}
+
+/* ══════════ RESPONSIVE ══════════ */
+@media (max-width:960px){
+  .hero-cols{grid-template-columns:1fr}
+  .hero-note{max-width:52ch}
+  .app-card,.app-card.s7,.app-card.s5{grid-column:span 12}
+  .ghost-num{top:-40px}
+}
+@media (max-width:760px){
+  .nav-link .n{display:none}
+  .vert-label{display:none}
+  .hero-stats{grid-template-columns:repeat(2,1fr);width:100%}
+  .stat:nth-child(2){border-right:none}
+  .stat:nth-child(-n+2){border-bottom:1px solid rgba(139,124,255,.25)}
+  .wave-card{grid-template-columns:1fr;top:calc(78px + var(--i)*22px)}
+  .wave-side{writing-mode:horizontal-tb;border-left:none;border-bottom:1px solid rgba(23,28,51,.2);padding:0 0 10px}
+  .step-track{grid-template-columns:repeat(5,minmax(64px,1fr));overflow-x:auto;padding-bottom:8px}
+  .step-line{left:10%;right:10%}
+  .step-en{display:none}
+  .step-panels{min-height:250px}
+  .feat-inner-pad{padding-left:6px}
+  .tl-item{grid-template-columns:1fr}
+  .scroll-cue{display:none}
+  .def-box{grid-template-columns:1fr}
+  .def-box .qmark{font-size:2.4rem}
+}
+/* ── reduced motion ── */
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}
+  [data-reveal]{opacity:1!important;transform:none!important}
+  .lm>span{transform:none!important}
+  .mq-track{animation:none!important}
+}
+</style>
+</head>
+<body>
+<div id="pbar"></div>
+<div class="noise" aria-hidden="true"></div>
+
+<!-- ═══════ NAV ═══════ -->
+<nav id="nav" aria-label="主要導覽">
+  <a class="brand" href="#top"><span class="brand-mark">◧</span>AI 課程初探<em>AIGC STUDY GUIDE</em></a>
+  <div class="nav-links">
+    <a class="nav-link" href="#ch1"><span class="n">壹</span>人工智慧</a>
+    <a class="nav-link" href="#ch2"><span class="n">貳</span>生成式 AI</a>
+    <a class="nav-link" href="#ch3"><span class="n">參</span>爭議與倫理</a>
+    <a class="nav-link" href="#refs"><span class="n">書</span>參考書目</a>
+  </div>
+</nav>
+
+<!-- ═══════ HERO ═══════ -->
+<header class="hero" id="top">
+  <canvas id="net" aria-hidden="true"></canvas>
+  <div class="hero-grid-bg" aria-hidden="true"></div>
+  <div class="vert-label" aria-hidden="true">人工智慧・生成內容・提示工程・倫理思辨</div>
+
+  <div class="hero-inner">
+    <div class="hero-top" data-reveal>
+      <span class="chip mono"><span class="pulse-dot"></span>學習指引 STUDY GUIDE</span>
+      <span class="chip mono">CHAPTERS 01–03 · 優化介面版</span>
+    </div>
+
+    <h1 class="hero-title" data-reveal data-delay="120">
+      <span class="ht-pre">AI 課程初探 ──</span>
+      <span class="ht-main" id="heroScramble">淺談生成式 AI<span class="vio">。</span></span>
+      <span class="ht-sub">AIGC = AI GENERATED CONTENT ・ 人工智慧產生內容</span>
+    </h1>
+
+    <div class="hero-cols">
+      <div data-reveal data-delay="240">
+        <p class="hero-note">從 1950 年代的符號邏輯，到今日能寫文章、畫圖、作曲、拍片的 AIGC——一份寫給學生的生成式 AI 入門地圖。</p>
+        <div class="hero-stats">
+          <div class="stat"><span class="stat-num" data-count="3">0</span><span class="stat-lab">章節 CHAPTERS</span></div>
+          <div class="stat"><span class="stat-num" data-count="7">0</span><span class="stat-lab">歷史里程碑</span></div>
+          <div class="stat"><span class="stat-num" data-count="6">0</span><span class="stat-lab">應用領域</span></div>
+          <div class="stat"><span class="stat-num" data-count="5">0</span><span class="stat-lab">爭議議題</span></div>
+        </div>
+      </div>
+
+      <div class="terminal" data-reveal data-delay="360" aria-label="生成式 AI 對話模擬">
+        <div class="term-bar">
+          <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+          <span class="term-title mono">aigc-intro.chat — 對話模擬</span>
+        </div>
+        <div class="term-body">
+          <div class="t-line user"><span class="t-tag">USER</span><span class="t-txt" id="termQ"></span><span class="cursor off" id="curQ"></span></div>
+          <div class="t-line ai"><span class="t-tag">AIGC</span><span class="t-txt" id="termA"></span><span class="cursor off" id="curA"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-cue mono" aria-hidden="true">SCROLL<span class="cue-line"></span></div>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="mq-track" id="mqTrack">
+      <span>人工智慧 AI</span><span>機器學習 ML</span><span>深度學習 DL</span><span>自然語言處理 NLP</span>
+      <span>提示詞 PROMPT</span><span>擴散模型 DIFFUSION</span><span>生成對抗網路 GANs</span><span>大型語言模型 LLM</span>
+    </div>
+  </div>
+</header>
+
+<main>
+<!-- ═══════ 壹、人工智慧 ═══════ -->
+<section class="chapter" id="ch1">
+  <div class="container">
+    <div class="sec-head" data-reveal="mask">
+      <span class="ghost-num" aria-hidden="true">壹</span>
+      <p class="kicker mono" data-scramble>CHAPTER 01 · ARTIFICIAL INTELLIGENCE</p>
+      <h2 class="sec-title"><span class="lm"><span>壹・人工智慧 <em>（AI）</em></span></span></h2>
+      <p class="sec-lede" style="margin-top:20px">人工智慧（AI）是一種涵蓋範圍很廣的技術，包括<mark>機器學習（ML）</mark>、<mark>深度學習（DL）</mark>、<mark>自然語言處理（NLP）</mark>等多種子領域。AI 可被設計來完成各種任務，從簡單的排序、分類，到複雜的圖片識別、語音識別等。</p>
+    </div>
+
+    <!-- 1-1 里程碑 -->
+    <div class="sub-head" data-reveal><span class="sub-idx">1.1</span><h3>發展歷程 — AI 歷史里程碑</h3></div>
+    <div class="timeline">
+      <div class="tl-rail" aria-hidden="true"><div class="tl-fill" id="tlFill"></div></div>
+      <ol class="tl-list" id="tlList">
+        <li class="tl-item" data-reveal><span class="tl-dot"></span><span class="tl-year">1950<small>年代 DECADE</small></span>
+          <div class="tl-card"><h4>人工智慧誕生 <span class="tl-tag mono">ORIGIN</span></h4><p>發明自我學習神經網路機器，AI 正式登上歷史舞臺。</p></div></li>
+        <li class="tl-item" data-reveal><span class="tl-dot"></span><span class="tl-year">1960<small>年代 DECADE</small></span>
+          <div class="tl-card"><h4>ELIZA 程式誕生 <span class="tl-tag mono">CHATBOT</span></h4><p>史上著名的交談程式，模擬心理治療師與人類對話。</p></div></li>
+        <li class="tl-item" data-reveal><span class="tl-dot"></span><span class="tl-year">1970<small>年代 DECADE</small></span>
+          <div class="tl-card"><h4>自然語言處理出現 <span class="tl-tag mono">NLP</span></h4><p>開始研究讓機器理解與運用人類的自然語言。</p></div></li>
+        <li class="tl-item" data-reveal><span class="tl-dot"></span><span class="tl-year">1990<small>年代 DECADE</small></span>
+          <div class="tl-card"><h4>機器翻譯進步 <span class="tl-tag mono">TRANSLATION</span></h4><p>跨語言自動翻譯技術明顯推進，語言藩籬逐漸鬆動。</p></div></li>
+        <li class="tl-item" data-reveal><span class="tl-dot"></span><span class="tl-year">2000<small>年代起 ONWARD</small></span>
+          <div class="tl-card"><h4>內容摘取與生成 <span class="tl-tag mono">CONTENT</span></h4><p>AI 系統開始能夠自動摘取和生成內容。</p></div></li>
+        <li class="tl-item" data-reveal><span class="tl-dot"></span><span class="tl-year">2010<small>年代 DECADE</small></span>
+          <div class="tl-card"><h4>深度學習興起 <span class="tl-tag mono">DEEP LEARNING</span></h4><p>深度學習興起，推動 AI 更智慧化。</p></div></li>
+        <li class="tl-item" data-reveal><span class="tl-dot"></span><span class="tl-year">2020<small>年代 DECADE</small></span>
+          <div class="tl-card"><h4>GPT-3 問世 <span class="tl-tag mono">GPT-3</span></h4><p>GPT-3 問世，證實 AI 技術高度發展的可能性。</p></div></li>
+      </ol>
+    </div>
+
+    <!-- 1-2 三波浪潮 -->
+    <div class="sub-head" data-reveal><span class="sub-idx">1.2</span><h3>人工智慧發展演進：三波浪潮</h3></div>
+    <p style="color:var(--ink-3);font-size:.82rem;letter-spacing:.08em;margin-bottom:28px" class="mono" data-reveal>—— 給學生的白話解說 · 向下捲動，卡片將逐一堆疊 ——</p>
+
+    <div class="wave-stack">
+      <article class="wave-card w1" style="--i:0">
+        <svg class="wave-ico" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10 8h20a4 4 0 0 1 4 4v28H14a4 4 0 0 1-4-4V8z"/><path d="M34 40a4 4 0 0 0-4-4H10"/><path d="M16 16h12M16 22h12M16 28h8"/></svg>
+        <span class="wave-ghost mono" aria-hidden="true">01</span>
+        <div class="wave-side mono">第一波 · 1950–1960</div>
+        <div>
+          <h3 class="wave-name">符號邏輯 <span class="en mono">SYMBOLIC LOGIC</span></h3>
+          <p class="wave-quote">「想像給電腦一本『超級詳細的說明書』。」</p>
+          <p class="wave-desc">程式設計師把所有規則（If / Then 邏輯）都寫進去。電腦只會按照說明書做事，但如果遇到說明書沒寫到的新問題，它就完全不知道該怎麼辦了。</p>
+          <span class="wave-badge bad"><span class="bdot"></span>結果：失敗 — AI 寒冬</span>
+        </div>
+      </article>
+
+      <article class="wave-card w2" style="--i:1">
+        <svg class="wave-ico" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="6" width="30" height="36" rx="3"/><path d="M15 14h18M15 20h18M15 26h11"/><circle cx="31" cy="33" r="4"/><path d="M34 36l4 4"/></svg>
+        <span class="wave-ghost mono" aria-hidden="true">02</span>
+        <div class="wave-side mono">第二波 · 1980–1990</div>
+        <div>
+          <h3 class="wave-name">專家系統 <span class="en mono">EXPERT SYSTEM</span></h3>
+          <p class="wave-quote">「像是給電腦『某個領域的專家筆記』。」</p>
+          <p class="wave-desc">程式設計師把特定領域專家（例如醫生或棋手）的經驗規則寫進去。它在診斷特定疾病或下棋等狹窄領域很厲害，但換一個領域或遇到模糊問題時，它的「專家知識」就沒用了。</p>
+          <span class="wave-badge bad"><span class="bdot"></span>結果：失敗 — AI 寒冬</span>
+        </div>
+      </article>
+
+      <article class="wave-card w3" style="--i:2">
+        <svg class="wave-ico" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="24" cy="24" r="14"/><path d="M24 10v6M24 32v6M10 24h6M32 24h6"/><circle cx="24" cy="24" r="4" fill="currentColor" stroke="none"/><path d="M15 15l4 4M29 29l4 4M33 15l-4 4M19 29l-4 4"/></svg>
+        <span class="wave-ghost mono" aria-hidden="true">03</span>
+        <div class="wave-side mono">第三波 · 2010–現在</div>
+        <div>
+          <h3 class="wave-name">機器學習 <span class="en mono">MACHINE LEARNING</span></h3>
+          <p class="wave-quote">「像是讓電腦『自己去上學學習』。」</p>
+          <p class="wave-desc">我們給它大量的例子（數據），它自己找出規律和模式，而不是我們直接寫規則。因此，它能處理更複雜、更像人類思考的問題，這就是深度學習的基礎。</p>
+          <span class="wave-badge good"><span class="bdot"></span>進行式 — 深度學習時代</span>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 貳、生成式 AI ═══════ -->
+<section class="chapter" id="ch2" style="background:var(--paper-2)">
+  <div class="container">
+    <div class="sec-head" data-reveal="mask">
+      <span class="ghost-num" aria-hidden="true">貳</span>
+      <p class="kicker mono" data-scramble>CHAPTER 02 · GENERATIVE AI (AIGC)</p>
+      <h2 class="sec-title"><span class="lm"><span>貳・生成式 AI <em>（AIGC）</em></span></span></h2>
+    </div>
+
+    <div class="banner" data-reveal>
+      <svg viewBox="0 0 1200 340" role="img" aria-label="生成式 AI 概念插畫：提示詞化為文字、圖片、音樂與影片">
+        <rect width="1200" height="340" fill="#EDE6D6"/>
+        <g class="kb-group">
+          <g stroke="#171C33" stroke-width="2.5" fill="none">
+            <rect x="70" y="128" width="150" height="84" rx="8" fill="#F4EFE4"/>
+            <path d="M90 152h110M90 170h86M90 188h62"/>
+            <rect x="86" y="196" width="10" height="16" fill="#5B4BE0" stroke="none" class="wiggle"/>
+          </g>
+          <g stroke="#5B4BE0" stroke-width="2.5" fill="none" stroke-dasharray="1 9" stroke-linecap="round">
+            <path d="M240 170 C 340 90, 420 90, 520 140"/>
+            <path d="M240 176 C 360 260, 520 260, 640 210"/>
+            <path d="M240 166 C 420 160, 640 110, 800 120"/>
+          </g>
+          <g class="float-a"><rect x="540" y="60" width="120" height="96" rx="6" fill="#F4EFE4" stroke="#171C33" stroke-width="2.5"/><path d="M552 130l24-28 18 18 14-16 30 34" stroke="#5B4BE0" stroke-width="2.5" fill="none"/><circle cx="566" cy="86" r="8" fill="#5B4BE0"/></g>
+          <g class="float-b"><circle cx="700" cy="230" r="46" fill="#F4EFE4" stroke="#171C33" stroke-width="2.5"/><circle cx="700" cy="230" r="12" fill="#EDE6D6" stroke="#171C33" stroke-width="2.5"/><path d="M760 196 q18 -22 12 -48" stroke="#5B4BE0" stroke-width="3" fill="none"/><path d="M772 148 l-14 8 16 8z" fill="#5B4BE0"/></g>
+          <g class="float-c"><rect x="850" y="90" width="230" height="70" rx="6" fill="#F4EFE4" stroke="#171C33" stroke-width="2.5"/><path d="M862 90v70M884 90v70M990 90v70M1012 90v70M1046 90v70" stroke="#171C33" stroke-width="1.5" opacity=".5"/><rect x="900" y="98" width="82" height="54" rx="3" fill="#5B4BE0" opacity=".85"/><path d="M932 114l22 12-22 12z" fill="#F4EFE4"/><path d="M850 186h230" stroke="#171C33" stroke-width="2.5" stroke-dasharray="4 8"/></g>
+          <g stroke="#171C33" stroke-width="2.5" fill="none" class="float-b"><path d="M420 250 q10 -20 20 0 t20 0 t20 0" stroke="#2AA6A0"/></g>
+        </g>
+        <text x="1180" y="322" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="11" letter-spacing="4" fill="#7A7F99">PROMPT → TEXT / IMAGE / MUSIC / VIDEO</text>
+      </svg>
+      <div class="banner-cap"><span>從一句提示詞，到一篇文章、一張圖、一首歌、一部影片。</span><span class="mono">FIG. 01 — AIGC PIPELINE</span></div>
+    </div>
+
+    <div class="def-box" data-reveal>
+      <span class="qmark" aria-hidden="true">「</span>
+      <p><strong>生成式 AI（人工智慧產生內容，AIGC）</strong>是 AI 的一個特定應用領域，專注於使用 AI 建立<mark>新的、原創的內容</mark>，包括文字、圖片、音樂、影片等各種形式。</p>
+    </div>
+
+    <!-- 2-1 生成步驟 -->
+    <div class="sub-head" data-reveal><span class="sub-idx">2.1</span><h3>生成步驟 — 從數據到內容</h3></div>
+    <div class="stepper" id="stepper" data-reveal>
+      <div class="step-track">
+        <div class="step-line" aria-hidden="true"><div class="step-fill" id="stepFill"></div></div>
+        <button class="step-btn active" type="button"><span class="step-dot">01</span><span class="step-name">數據收集</span><span class="step-en mono">Data Collection</span></button>
+        <button class="step-btn" type="button"><span class="step-dot">02</span><span class="step-name">數據預處理</span><span class="step-en mono">Preprocessing</span></button>
+        <button class="step-btn" type="button"><span class="step-dot">03</span><span class="step-name">模型訓練</span><span class="step-en mono">Model Training</span></button>
+        <button class="step-btn" type="button"><span class="step-dot">04</span><span class="step-name">內容生成</span><span class="step-en mono">Generation</span></button>
+        <button class="step-btn" type="button"><span class="step-dot">05</span><span class="step-name">優化與後處理</span><span class="step-en mono">Post-processing</span></button>
+      </div>
+      <div class="step-panels" id="stepPanels">
+        <div class="step-panel active"><p>從網路、文獻、開源庫等收集大量且多樣化的數據（文本、圖像等），這是 AI 學習的基礎。</p><span class="panel-tag mono">STEP 01 / 05</span></div>
+        <div class="step-panel"><p>對原始數據進行清洗、規範化、標註、去重和格式化，以消除噪聲和錯誤，確保數據質量。</p><span class="panel-tag mono">STEP 02 / 05</span></div>
+        <div class="step-panel"><p>使用預處理後的數據來訓練 AI 模型（如 GPT、Diffusion Model），使其學習數據中的潛在模式和結構。</p><span class="panel-tag mono">STEP 03 / 05</span></div>
+        <div class="step-panel"><p>模型基於用戶的輸入（Prompt，提示詞）和已學習的知識，利用機率預測等技術生成全新的、原創的內容。</p><span class="panel-tag mono">STEP 04 / 05</span></div>
+        <div class="step-panel"><p>對生成的內容進行校驗、審核、風格調整和精煉，確保輸出內容符合要求並兼顧安全性和倫理規範。</p><span class="panel-tag mono">STEP 05 / 05</span></div>
+      </div>
+      <p class="step-hint mono" id="stepHint">▸ 自動播放中 · 點擊任一步驟可切換並重新計時</p>
+    </div>
+
+    <!-- 2-2 應用範圍 -->
+    <div class="sub-head" data-reveal><span class="sub-idx">2.2</span><h3>應用範圍 — AIGC 六大領域</h3></div>
+    <div class="bento">
+      <article class="app-card s7" data-reveal>
+        <div class="app-media">
+          <svg viewBox="0 0 560 220" role="img" aria-label="文字生成示意插畫"><rect width="560" height="220" fill="#EDE6D6"/><g class="float-a"><path d="M120 168 L150 60 l8 0 30 108" stroke="#171C33" stroke-width="3" fill="none"/><path d="M132 132h44" stroke="#171C33" stroke-width="3"/></g><g stroke="#171C33" stroke-width="2.5" fill="#F4EFE4"><rect x="230" y="58" width="270" height="112" rx="8"/></g><g stroke="#5B4BE0" stroke-width="2.5" stroke-linecap="round"><path d="M252 84h180M252 104h226M252 124h150M252 144h198"/></g><g class="float-b"><rect x="434" y="138" width="12" height="18" fill="#5B4BE0" class="wiggle"/></g><g stroke="#2AA6A0" stroke-width="2.5" fill="none" class="float-c"><path d="M186 60 q8 -18 24 -12"/><path d="M204 44 l6 4 -2 8z" fill="#2AA6A0"/></g></svg>
+          <span class="app-idx">APP · 01</span>
+        </div>
+        <div class="app-body">
+          <h4>文字生成 <span class="en">TEXT</span></h4>
+          <p>根據主題自動產生完整的文章、觀點或建議。</p>
+          <div class="tools"><span class="tools-lab">參考工具</span><span class="chip-tool">ChatGPT</span><span class="chip-tool">Copilot</span><span class="chip-tool">Gemini</span><span class="chip-tool">豆包</span><span class="chip-tool">DeepSeek</span></div>
+        </div>
+      </article>
+
+      <article class="app-card s5" data-reveal data-delay="100">
+        <div class="app-media">
+          <svg viewBox="0 0 560 220" role="img" aria-label="圖片生成示意插畫"><rect width="560" height="220" fill="#EDE6D6"/><g class="float-b"><rect x="170" y="34" width="220" height="150" rx="8" fill="#F4EFE4" stroke="#171C33" stroke-width="3"/><circle cx="220" cy="76" r="14" fill="#5B4BE0"/><path d="M192 156l44-52 30 30 26-32 56 62" fill="none" stroke="#5B4BE0" stroke-width="3"/></g><g stroke="#171C33" stroke-width="2.5" fill="none" class="float-a"><path d="M96 190 q60 -34 74 -34"/><path d="M420 196 q40 -30 44 -60"/></g><g fill="#5B4BE0" class="float-c"><circle cx="100" cy="60" r="5"/><circle cx="472" cy="80" r="5"/><circle cx="452" cy="46" r="3.5"/></g></svg>
+          <span class="app-idx">APP · 02</span>
+        </div>
+        <div class="app-body">
+          <h4>圖片生成 <span class="en">IMAGE</span></h4>
+          <p>根據文字描述產生對應的圖片（例如使用 GANs 技術）。</p>
+          <div class="tools"><span class="tools-lab">參考工具</span><span class="chip-tool">Midjourney</span><span class="chip-tool">Bing</span><span class="chip-tool">KLING AI</span><span class="chip-tool">Leonardo.Ai</span><span class="chip-tool">Dreamina</span></div>
+        </div>
+      </article>
+
+      <article class="app-card s5" data-reveal>
+        <div class="app-media">
+          <svg viewBox="0 0 560 220" role="img" aria-label="音樂生成示意插畫"><rect width="560" height="220" fill="#EDE6D6"/><g class="float-a"><circle cx="200" cy="130" r="56" fill="#171C33"/><circle cx="200" cy="130" r="18" fill="#EDE6D6"/><circle cx="200" cy="130" r="5" fill="#5B4BE0"/><path d="M200 74a56 56 0 0 1 56 56" stroke="#5B4BE0" stroke-width="3" fill="none"/></g><g stroke="#5B4BE0" stroke-width="3" fill="none"><path d="M280 128 q10 -26 20 0 t20 0 t20 0 t20 0 t20 0" class="wiggle"/></g><g fill="#171C33" class="float-b"><circle cx="452" cy="96" r="9"/><path d="M461 96v-40h22v10h-18z"/></g><g fill="#171C33" class="float-c"><circle cx="392" cy="66" r="7"/><path d="M399 66v-30h18v9h-15z"/></g></svg>
+          <span class="app-idx">APP · 03</span>
+        </div>
+        <div class="app-body">
+          <h4>音樂生成 <span class="en">MUSIC</span></h4>
+          <p>根據主題或風格創作出一首歌曲。</p>
+          <div class="tools"><span class="tools-lab">參考工具</span><span class="chip-tool">SUNO</span></div>
+        </div>
+      </article>
+
+      <article class="app-card s7" data-reveal data-delay="100">
+        <div class="app-media">
+          <svg viewBox="0 0 560 220" role="img" aria-label="影片生成示意插畫"><rect width="560" height="220" fill="#EDE6D6"/><g><rect x="60" y="76" width="440" height="68" rx="8" fill="#F4EFE4" stroke="#171C33" stroke-width="3"/><path d="M92 76v68M124 76v68M436 76v68M468 76v68" stroke="#171C33" stroke-width="1.8" opacity=".5"/><g class="wiggle"><rect x="236" y="84" width="88" height="52" rx="4" fill="#5B4BE0"/><path d="M270 98l26 12-26 12z" fill="#F4EFE4"/></g></g><g fill="#171C33" class="float-a"><rect x="150" y="88" width="52" height="44" rx="4"/><path d="M168 100l18 10-18 10z" fill="#EDE6D6"/></g><g stroke="#2AA6A0" stroke-width="3" fill="none" class="float-c"><path d="M340 176h120" stroke-dasharray="6 10"/></g></svg>
+          <span class="app-idx">APP · 04</span>
+        </div>
+        <div class="app-body">
+          <h4>影片生成 <span class="en">VIDEO</span></h4>
+          <p>能生成影片，包括圖片轉動畫、文字轉影片，甚至深度偽造（Deepfakes）。</p>
+          <div class="tools"><span class="tools-lab">參考工具</span><span class="chip-tool">LUMA AI</span><span class="chip-tool">Runway</span><span class="chip-tool">KLING AI</span><span class="chip-tool">Vidu</span></div>
+        </div>
+      </article>
+
+      <article class="app-card s5" data-reveal>
+        <div class="app-media">
+          <svg viewBox="0 0 560 220" role="img" aria-label="聲音錄製與克隆示意插畫"><rect width="560" height="220" fill="#EDE6D6"/><g class="float-a"><rect x="252" y="34" width="56" height="92" rx="28" fill="#F4EFE4" stroke="#171C33" stroke-width="3"/><path d="M232 96a48 48 0 0 0 96 0M280 152v24M258 176h44" stroke="#171C33" stroke-width="3" fill="none"/></g><g stroke="#5B4BE0" stroke-width="3" fill="none"><path d="M150 110 q10 -30 20 0 t20 0" class="wiggle"/></g><g stroke="#171C33" stroke-width="3" fill="none" stroke-dasharray="5 7"><path d="M392 110 q10 -30 20 0 t20 0" class="wiggle"/></g></svg>
+          <span class="app-idx">APP · 05</span>
+        </div>
+        <div class="app-body">
+          <h4>聲音錄製與克隆 <span class="en">VOICE</span></h4>
+          <p>文本轉旁白，或將他人的聲音與輸入文本合成為新的旁白。</p>
+          <div class="tools"><span class="tools-lab">參考工具</span><span class="chip-tool">海螺AI</span><span class="chip-tool">TTSMAKER</span><span class="chip-tool">HOIZ</span></div>
+        </div>
+      </article>
+
+      <article class="app-card s7" data-reveal data-delay="100">
+        <div class="app-media">
+          <svg viewBox="0 0 560 220" role="img" aria-label="影片製作剪輯示意插畫"><rect width="560" height="220" fill="#EDE6D6"/><g><rect x="70" y="96" width="120" height="30" rx="4" fill="#F4EFE4" stroke="#171C33" stroke-width="2.5"/><rect x="198" y="96" width="180" height="30" rx="4" fill="#5B4BE0" opacity=".85"/><rect x="386" y="96" width="104" height="30" rx="4" fill="#F4EFE4" stroke="#171C33" stroke-width="2.5"/><rect x="110" y="134" width="150" height="30" rx="4" fill="#2AA6A0" opacity=".75"/><rect x="268" y="134" width="200" height="30" rx="4" fill="#F4EFE4" stroke="#171C33" stroke-width="2.5"/></g><path d="M320 66v124" stroke="#C8442A" stroke-width="3" class="wiggle"/><path d="M310 60h20l-10 14z" fill="#C8442A"/><g stroke="#171C33" stroke-width="2.5" fill="none" class="float-b"><circle cx="120" cy="56" r="9"/><circle cx="146" cy="56" r="9"/><path d="M127 62l32 26M139 62l-32 26"/></g></svg>
+          <span class="app-idx">APP · 06</span>
+        </div>
+        <div class="app-body">
+          <h4>影片製作剪輯 <span class="en">EDITING</span></h4>
+          <p>AI 剪輯能自動添加字幕、調整色彩，提高效率並降低製作成本。</p>
+          <div class="tools"><span class="tools-lab">參考工具</span><span class="chip-tool">CapCut</span><span class="chip-tool">MyEdit</span></div>
+        </div>
+      </article>
+    </div>
+
+    <!-- 2-3 特點與範例 -->
+    <div class="sub-head" data-reveal><span class="sub-idx">2.3</span><h3>生成式 AI 的特點與範例</h3></div>
+    <div class="feats" data-reveal>
+      <div class="feat-item open">
+        <button class="feat-head" aria-expanded="true"><span class="feat-num">01</span><span class="feat-tt"><strong>機器學習能力強</strong><em class="chip-sm">先進算法</em></span><span class="feat-x">＋</span></button>
+        <div class="feat-panel"><div class="feat-inner"><div class="feat-inner-pad">
+          <p>透過大量的數據和深度學習，AI 能掌握複雜的規律，並做出高水平的判斷與生成。</p>
+          <div class="example"><span class="ex-lab">【範例】</span><p>AI 在圍棋等複雜遊戲中，能自我訓練並擊敗世界級人類選手，其策略和下法甚至超出了人類的既有認知。</p></div>
+        </div></div></div>
+      </div>
+      <div class="feat-item">
+        <button class="feat-head" aria-expanded="false"><span class="feat-num">02</span><span class="feat-tt"><strong>自動化</strong><em class="chip-sm">無須干預</em></span><span class="feat-x">＋</span></button>
+        <div class="feat-panel"><div class="feat-inner"><div class="feat-inner-pad">
+          <p>一旦設定好目標和規則，AI 就能自主地完成重複性高、耗費時間的任務。</p>
+          <div class="example"><span class="ex-lab">【範例】</span><p>利用 AI 程式碼生成工具，你只需用自然語言描述需要的功能（例如「寫一個計算 BMI 的 Python 函式」），AI 就能自動寫出、檢查並優化程式碼。</p></div>
+        </div></div></div>
+      </div>
+      <div class="feat-item">
+        <button class="feat-head" aria-expanded="false"><span class="feat-num">03</span><span class="feat-tt"><strong>高效率</strong><em class="chip-sm">快速且準確</em></span><span class="feat-x">＋</span></button>
+        <div class="feat-panel"><div class="feat-inner"><div class="feat-inner-pad">
+          <p>能在極短時間內處理龐大的資訊量，並產生多種結果供使用者選擇。</p>
+          <div class="example"><span class="ex-lab">【範例】</span><p>傳統上設計師繪製產品草圖可能需要一週，但透過 AI 圖片生成工具，輸入幾句提示詞，幾秒鐘內就能產生數十種不同風格的設計概念圖。</p></div>
+        </div></div></div>
+      </div>
+      <div class="feat-item">
+        <button class="feat-head" aria-expanded="false"><span class="feat-num">04</span><span class="feat-tt"><strong>風格一致</strong><em class="chip-sm">保持統一性</em></span><span class="feat-x">＋</span></button>
+        <div class="feat-panel"><div class="feat-inner"><div class="feat-inner-pad">
+          <p>AI 可以學習特定的風格、語氣或品牌規範，並將其應用於所有的生成內容中。</p>
+          <div class="example"><span class="ex-lab">【範例】</span><p>一家公司可以將其品牌手冊輸入 AI，要求 AI 生成所有廣告文案時，必須使用「年輕、活潑、專業」的語氣，確保對外溝通的風格完全統一。</p></div>
+        </div></div></div>
+      </div>
+      <div class="feat-item">
+        <button class="feat-head" aria-expanded="false"><span class="feat-num">05</span><span class="feat-tt"><strong>個性化定制</strong><em class="chip-sm">量身定制體驗</em></span><span class="feat-x">＋</span></button>
+        <div class="feat-panel"><div class="feat-inner"><div class="feat-inner-pad">
+          <p>AI 能根據用戶的歷史數據、偏好或即時反饋，調整生成內容以滿足個別需求。</p>
+          <div class="example"><span class="ex-lab">【範例】</span><p>在音樂串流平台上，AI 可以分析你過去聽的歌曲，為你自動生成一首「專屬於你的、融合了電子樂和古典樂元素的助眠歌曲」。</p></div>
+        </div></div></div>
+      </div>
+      <div class="feat-item">
+        <button class="feat-head" aria-expanded="false"><span class="feat-num">06</span><span class="feat-tt"><strong>不斷改進</strong><em class="chip-sm">持續的增強和更新</em></span><span class="feat-x">＋</span></button>
+        <div class="feat-panel"><div class="feat-inner"><div class="feat-inner-pad">
+          <p>通過每一次的互動和新數據的輸入，AI 模型能夠自我優化，提升其生成質量和準確性。</p>
+          <div class="example"><span class="ex-lab">【範例】</span><p>當 AI 翻譯系統被修正了某個常見的錯誤翻譯後，下次所有使用者遇到同樣語句時，AI 都能提供更準確的翻譯，並且在處理其他相似語句時也會一併改進。</p></div>
+        </div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 參、爭議 ═══════ -->
+<section class="chapter chapter-dark" id="ch3" style="padding-top:0">
+  <div class="hazard" aria-hidden="true"></div>
+  <div class="container" style="padding-top:clamp(84px,11vw,132px);padding-bottom:clamp(84px,11vw,132px)">
+    <div class="sec-head" data-reveal="mask">
+      <span class="ghost-num" aria-hidden="true">參</span>
+      <p class="kicker mono" data-scramble>CHAPTER 03 · CONTROVERSIES &amp; ETHICS</p>
+      <h2 class="sec-title"><span class="lm"><span>參・生成式 AI 的<em>爭議</em></span></span></h2>
+    </div>
+
+    <blockquote class="pull-quote" data-reveal>
+      生成式 AI 具有巨大的潛力，但同時也引發了廣泛的爭議與問題，需要我們謹慎使用。
+      <span class="mono">—— 本章重點 · 點擊卡片翻面查看解說</span>
+    </blockquote>
+
+    <div class="risks">
+      <div class="flip" tabindex="0" role="button" aria-pressed="false" aria-label="幻覺，點擊翻面查看說明">
+        <div class="flip-inner">
+          <div class="flip-face flip-front">
+            <svg class="risk-ico" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 24s8-13 20-13 20 13 20 13-8 13-20 13S4 24 4 24z"/><circle cx="24" cy="24" r="6"/><path d="M24 4v5M38 8l-3 4M10 8l3 4"/></svg>
+            <h4>幻覺</h4><span class="risk-en mono">HALLUCINATION · 人工幻覺</span>
+            <span class="flip-hint mono">點擊翻面 <span class="spin-ic">↻</span></span>
+          </div>
+          <div class="flip-face flip-back">
+            <h5>幻覺（Hallucination）</h5>
+            <p>由人工智慧生成的一種回應，含有貌似事實的虛假或誤導性資訊。危險之處在於模型的輸出看起來是正確的，但實際上是錯誤的。</p>
+            <div class="risk-case"><span class="mono">【解說範例】</span><p>當你詢問 AI 某位科學家的出生年份，AI 可能會給出一個看似準確的日期（例如 1895 年），但實際上該科學家出生於 1905 年。AI 會虛構不存在的事實或引用來源，讓你難以辨別真偽。</p></div>
+            <span class="back-close mono">再次點擊翻回 ↻</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flip" tabindex="0" role="button" aria-pressed="false" aria-label="偏見與歧視，點擊翻面查看說明">
+        <div class="flip-inner">
+          <div class="flip-face flip-front">
+            <svg class="risk-ico" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M24 6v36M14 42h20"/><path d="M8 14l32-4"/><path d="M8 14l-5 12a7 7 0 0 0 10 0zM40 10l-5 12a7 7 0 0 0 10 0z"/></svg>
+            <h4>偏見（歧視）</h4><span class="risk-en mono">BIAS &amp; DISCRIMINATION</span>
+            <span class="flip-hint mono">點擊翻面 <span class="spin-ic">↻</span></span>
+          </div>
+          <div class="flip-face flip-back">
+            <h5>偏見（歧視）</h5>
+            <p>AI 基於特定訓練資料的偏見而作出決策。例如，以白人臉孔為主的訓練資料會導致臉部辨識系統在面對不同文化群體時無法做出準確判斷。</p>
+            <div class="risk-case"><span class="mono">【解說範例】</span><p>若 AI 圖片生成工具訓練時，多數圖片將「醫生」與「男性」、「護士」與「女性」連結，當你要求它繪製「醫生」圖片時，它會傾向於產生男性圖像。這種結果反映了訓練數據中存在的性別刻板印象。</p></div>
+            <span class="back-close mono">再次點擊翻回 ↻</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flip" tabindex="0" role="button" aria-pressed="false" aria-label="版權問題，點擊翻面查看說明">
+        <div class="flip-inner">
+          <div class="flip-face flip-front">
+            <svg class="risk-ico" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="24" cy="24" r="18"/><path d="M30 18a8 8 0 1 0 0 12"/><path d="M6 42L42 6" stroke-width="2.5"/></svg>
+            <h4>版權問題</h4><span class="risk-en mono">COPYRIGHT ISSUES</span>
+            <span class="flip-hint mono">點擊翻面 <span class="spin-ic">↻</span></span>
+          </div>
+          <div class="flip-face flip-back">
+            <h5>版權問題</h5>
+            <p>AIGC 大量蒐集資料進行訓練，這些資料的合法途徑存在爭議；AIGC 產生的作品是否受著作權法保護也尚無定論。</p>
+            <span class="back-close mono">再次點擊翻回 ↻</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flip" tabindex="0" role="button" aria-pressed="false" aria-label="假新聞與假訊息，點擊翻面查看說明">
+        <div class="flip-inner">
+          <div class="flip-face flip-front">
+            <svg class="risk-ico" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="8" y="8" width="32" height="34" rx="3"/><path d="M14 16h20M14 22h20M14 28h12"/><path d="M34 30l3 6h-6z" fill="currentColor"/><path d="M34 24v4" stroke-width="2.5"/></svg>
+            <h4>假新聞與假訊息</h4><span class="risk-en mono">FAKE NEWS &amp; MISINFORMATION</span>
+            <span class="flip-hint mono">點擊翻面 <span class="spin-ic">↻</span></span>
+          </div>
+          <div class="flip-face flip-back">
+            <h5>假新聞與假訊息的傳播</h5>
+            <p>利用 AIGC 技術可以大量製造假新聞與假訊息，並在網路中快速傳播。</p>
+            <span class="back-close mono">再次點擊翻回 ↻</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flip" tabindex="0" role="button" aria-pressed="false" aria-label="深度偽造，點擊翻面查看說明">
+        <div class="flip-inner">
+          <div class="flip-face flip-front">
+            <svg class="risk-ico" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M16 8h16v14a8 8 0 0 1-16 0z"/><path d="M20 16h2M26 16h2M21 24c1.5 1.2 4.5 1.2 6 0"/><path d="M32 14h6v12a7 7 0 0 1-7 7" opacity=".55"/><path d="M8 40l32-28" stroke-width="1.4" stroke-dasharray="3 4"/></svg>
+            <h4>深度偽造</h4><span class="risk-en mono">DEEPFAKES</span>
+            <span class="flip-hint mono">點擊翻面 <span class="spin-ic">↻</span></span>
+          </div>
+          <div class="flip-face flip-back">
+            <h5>深度偽造（Deepfakes）</h5>
+            <p>專指基於人工智慧的人體圖像合成技術，可將已有的圖像或影片疊加至目標圖像或影片上，常用來偽造有害媒體。</p>
+            <div class="risk-case"><span class="mono">【解說範例】</span><p>透過 Deepfake 技術，可以將某位公眾人物的臉孔「換」到一段虛假的影片中，讓他們看起來好像說了或做了從未發生過的事情，這可能被用於進行詐騙、惡意誹謗或影響選舉。</p></div>
+            <span class="back-close mono">再次點擊翻回 ↻</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="risk-note mono" data-reveal>五大爭議 · 看見潛力，也看見界線 —— <b>謹慎使用</b>是與 AI 共處的第一課</p>
+  </div>
+  <div class="hazard" aria-hidden="true"></div>
+</section>
+
+<!-- ═══════ 參考書目 ═══════ -->
+<section class="chapter" id="refs" style="padding-top:clamp(72px,9vw,110px)">
+  <div class="container">
+    <div class="sec-head" data-reveal="mask" style="margin-bottom:40px">
+      <p class="kicker mono" data-scramble>APPENDIX · REFERENCES</p>
+      <h2 class="sec-title"><span class="lm"><span>參考書目</span></span></h2>
+    </div>
+    <ol class="ref-list">
+      <li data-reveal><span class="ref-idx">[01]</span><span class="ref-title">《圖解AI人工智慧》</span></li>
+      <li data-reveal data-delay="100"><span class="ref-idx">[02]</span><span class="ref-title">《AI.抄襲.智財權》</span></li>
+      <li data-reveal data-delay="200"><span class="ref-idx">[03]</span><span class="ref-title">《AI人工智慧導論：理論、實務及素養》</span></li>
+    </ol>
+    <p class="colophon mono" data-reveal>網頁內容根據「AI課程初探：淺談生成式AI」文件轉換製作。</p>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="container foot-inner">
+    <div>
+      <p class="foot-brand">AI 課程初探 — 淺談生成式 AI（AIGC）</p>
+      <p class="foot-note mono" style="margin-top:6px">EDUCATIONAL STUDY GUIDE · 從數據到內容，從工具到素養</p>
+    </div>
+    <button class="to-top" id="toTop" type="button">回到頂端 ↑</button>
+  </div>
+</footer>
+
+<script>
+(function(){
+"use strict";
+var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ── reveal on scroll ── */
+var revealEls = document.querySelectorAll('[data-reveal]');
+revealEls.forEach(function(el){ if(el.dataset.delay){ el.style.transitionDelay = el.dataset.delay + 'ms'; } });
+var io = new IntersectionObserver(function(entries){
+  entries.forEach(function(en){
+    if(en.isIntersecting){
+      en.target.classList.add('in');
+      var kick = en.target.matches('[data-scramble]') ? en.target : en.target.querySelector('[data-scramble]');
+      if(kick && !kick.dataset.done){ kick.dataset.done = '1'; scramble(kick, kick.dataset.text, 800); }
+      io.unobserve(en.target);
+    }
+  });
+},{threshold:.14});
+revealEls.forEach(function(el){ io.observe(el); });
+
+/* ── scramble decode ── */
+var POOL = '生成式人工智慧機器學習資料模型演算法神經網路01∆▓░#*';
+function scramble(el, finalText, dur){
+  if(REDUCED){ el.textContent = finalText; return; }
+  var len = finalText.length, t0 = performance.now();
+  (function tick(now){
+    var p = Math.min(1,(now - t0)/dur), lock = Math.floor(p*len), out = finalText.slice(0,lock);
+    for(var i=lock;i<len;i++){ out += finalText[i]===' ' ? ' ' : POOL[Math.random()*POOL.length|0]; }
+    el.textContent = out;
+    if(p<1){ requestAnimationFrame(tick); } else { el.textContent = finalText; }
+  })(t0);
+}
+document.querySelectorAll('[data-scramble]').forEach(function(el){ el.dataset.text = el.textContent; });
+if(!REDUCED){ setTimeout(function(){ scramble(document.getElementById('heroScramble'),'淺談生成式 AI。',1100); },200); }
+
+/* ── count-up stats ── */
+document.querySelectorAll('[data-count]').forEach(function(el){
+  var target = +el.dataset.count;
+  if(REDUCED){ el.textContent = target; return; }
+  var t0 = performance.now();
+  (function f(n){ var p = Math.min(1,(n-t0)/1200); el.textContent = Math.round(target*(p*(2-p))); if(p<1) requestAnimationFrame(f); })(t0);
+});
+
+/* ── hero neural canvas ── */
+var canvas = document.getElementById('net'), ctx = canvas.getContext('2d');
+var heroEl = document.querySelector('.hero'), nodes = [], heroVisible = true, rafId = null, dpr = Math.min(window.devicePixelRatio||1,2);
+function sizeCanvas(){
+  canvas.width = canvas.offsetWidth*dpr; canvas.height = canvas.offsetHeight*dpr;
+  var count = Math.min(80, Math.floor(canvas.offsetWidth*canvas.offsetHeight/16000));
+  nodes = [];
+  for(var i=0;i<count;i++){
+    nodes.push({ x:Math.random()*canvas.width, y:Math.random()*canvas.height,
+      vx:(Math.random()-.5)*.28*dpr, vy:(Math.random()-.5)*.28*dpr,
+      r:(Math.random()*1.6+.8)*dpr, teal:Math.random()<.22 });
+  }
+}
+function drawNet(move){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  var linkDist = 150*dpr;
+  for(var i=0;i<nodes.length;i++){
+    var a = nodes[i];
+    if(move){
+      a.x += a.vx; a.y += a.vy;
+      if(a.x<0||a.x>canvas.width) a.vx*=-1;
+      if(a.y<0||a.y>canvas.height) a.vy*=-1;
+    }
+    for(var j=i+1;j<nodes.length;j++){
+      var b = nodes[j], dx=a.x-b.x, dy=a.y-b.y, d=Math.sqrt(dx*dx+dy*dy);
+      if(d<linkDist){
+        ctx.strokeStyle = 'rgba(139,124,255,'+((1-d/linkDist)*.22)+')';
+        ctx.lineWidth = dpr*.6;
+        ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+      }
+    }
+  }
+  nodes.forEach(function(p){
+    ctx.fillStyle = p.teal ? 'rgba(42,166,160,.8)' : 'rgba(159,147,255,.75)';
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+  });
+}
+function loop(){ if(!heroVisible||REDUCED) return; drawNet(true); rafId = requestAnimationFrame(loop); }
+sizeCanvas(); drawNet(false);
+if(!REDUCED){
+  new IntersectionObserver(function(e){ heroVisible = e[0].isIntersecting; if(heroVisible && !rafId) loop(); },{}).observe(heroEl);
+  loop();
+}
+var rsT; window.addEventListener('resize',function(){ clearTimeout(rsT); rsT=setTimeout(function(){ sizeCanvas(); drawNet(false); },200); });
+
+/* ── terminal typing ── */
+var DIALOGUES = [
+  {q:'什麼是生成式 AI？', a:'它是 AI 的應用分支（AIGC），能依提示詞生成文字、圖片、音樂、影片等全新原創內容。'},
+  {q:'AI 經歷了哪三波浪潮？', a:'符號邏輯 → 專家系統 → 機器學習。第三波靠大量數據自行學習，正是深度學習的基礎。'},
+  {q:'使用 AIGC 要注意什麼？', a:'當心幻覺與偏見、版權爭議與深偽假訊息——輸出務必查證，謹慎使用。'}
+];
+var qEl=document.getElementById('termQ'), aEl=document.getElementById('termA'),
+    curQ=document.getElementById('curQ'), curA=document.getElementById('curA');
+function sleep(ms){ return new Promise(function(r){ setTimeout(r,ms); }); }
+function typeInto(el,text,speed){
+  return new Promise(function(res){
+    var i=0;
+    (function step(){ if(i>=text.length){ res(); return; } el.textContent += text[i++]; setTimeout(step,speed); })();
+  });
+}
+if(REDUCED){
+  qEl.textContent = DIALOGUES[0].q; aEl.textContent = DIALOGUES[0].a;
+}else{
+  (async function(){
+    var idx=0;
+    for(;;){
+      var d = DIALOGUES[idx % DIALOGUES.length];
+      qEl.textContent=''; aEl.textContent='';
+      curQ.classList.remove('off'); curA.classList.add('off');
+      await sleep(600); await typeInto(qEl,d.q,85);
+      await sleep(420);
+      curQ.classList.add('off'); curA.classList.remove('off');
+      await typeInto(aEl,d.a,28);
+      await sleep(3400);
+      idx++;
+    }
+  })();
+}
+
+/* ── marquee: duplicate content ── */
+var mq = document.getElementById('mqTrack');
+mq.innerHTML += mq.innerHTML;
+
+/* ── timeline scroll progress ── */
+var tlList = document.getElementById('tlList'), tlFill = document.getElementById('tlFill');
+var tlItems = document.querySelectorAll('.tl-item');
+function tlUpdate(){
+  var r = tlList.getBoundingClientRect(), vh = window.innerHeight;
+  var p = Math.max(0, Math.min(1, (vh*.72 - r.top) / (r.height||1)));
+  tlFill.style.height = (p*100)+'%';
+  tlItems.forEach(function(it){ if(it.getBoundingClientRect().top < vh*.78) it.classList.add('on'); });
+}
+
+/* ── stepper ── */
+var stepBtns = Array.prototype.slice.call(document.querySelectorAll('.step-btn'));
+var stepPanels = Array.prototype.slice.call(document.querySelectorAll('.step-panel'));
+var stepFill = document.getElementById('stepFill'), stepHint = document.getElementById('stepHint');
+var cur = 0, stepTimer = null;
+function goStep(i){
+  cur = (i + stepBtns.length) % stepBtns.length;
+  stepBtns.forEach(function(b,j){ b.classList.toggle('active', j===cur); });
+  stepPanels.forEach(function(pn,j){ pn.classList.toggle('active', j===cur); });
+  stepFill.style.width = (((cur+1)/stepBtns.length)*100)+'%';
+}
+function startAuto(){
+  if(REDUCED){ stepHint.textContent = '▸ 點擊任一步驟查看對應說明'; return; }
+  clearInterval(stepTimer);
+  stepTimer = setInterval(function(){ goStep(cur+1); }, 4500);
+}
+stepBtns.forEach(function(b,i){ b.addEventListener('click', function(){ goStep(i); startAuto(); }); });
+var stepperEl = document.getElementById('stepper');
+stepperEl.addEventListener('mouseenter', function(){ clearInterval(stepTimer); if(!REDUCED) stepHint.textContent='▸ 已暫停 · 離開後自動繼續播放'; });
+stepperEl.addEventListener('mouseleave', function(){ startAuto(); stepHint.textContent='▸ 自動播放中 · 點擊任一步驟可切換並重新計時'; });
+startAuto();
+
+/* ── feature accordion ── */
+document.querySelectorAll('.feat-head').forEach(function(h){
+  h.addEventListener('click', function(){
+    var item = h.parentElement, wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.feat-item.open').forEach(function(o){
+      o.classList.remove('open'); o.querySelector('.feat-head').setAttribute('aria-expanded','false');
+    });
+    if(!wasOpen){ item.classList.add('open'); h.setAttribute('aria-expanded','true'); }
+  });
+});
+
+/* ── flip cards ── */
+document.querySelectorAll('.flip').forEach(function(c){
+  function toggle(){ c.classList.toggle('flipped'); c.setAttribute('aria-pressed', c.classList.contains('flipped')); }
+  c.addEventListener('click', toggle);
+  c.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggle(); } });
+});
+
+/* ── nav / spy / progress ── */
+var nav = document.getElementById('nav'), pbar = document.getElementById('pbar');
+var links = Array.prototype.slice.call(document.querySelectorAll('.nav-link'));
+var secs = links.map(function(l){ return document.querySelector(l.getAttribute('href')); });
+function spy(){
+  var st = window.scrollY, current = 'top';
+  secs.forEach(function(s){ if(s && st >= s.offsetTop - 220) current = s.id; });
+  links.forEach(function(l){ l.classList.toggle('active', l.getAttribute('href') === '#'+current); });
+}
+var ticking = false;
+window.addEventListener('scroll', function(){
+  if(ticking) return; ticking = true;
+  requestAnimationFrame(function(){
+    var st = window.scrollY;
+    pbar.style.width = (st/((document.documentElement.scrollHeight - window.innerHeight)||1)*100)+'%';
+    nav.classList.toggle('scrolled', st > 50);
+    spy(); tlUpdate();
+    ticking = false;
+  });
+},{passive:true});
+tlUpdate(); spy();
+
+document.getElementById('toTop').addEventListener('click', function(){
+  window.scrollTo({top:0, behavior: REDUCED ? 'auto' : 'smooth'});
+});
+})();
+</script>
+</body>
+</html>
